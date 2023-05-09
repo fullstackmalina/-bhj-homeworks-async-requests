@@ -1,26 +1,26 @@
-"use strict";
+'use strict';
 
-const progress = document.getElementById("progress"),
-    form = document.getElementById("form");
+const progress = document.getElementById('progress');
 
-form.addEventListener("submit", (e) => {
+form.addEventListener('submit', check);
+
+function check(event) {
+
+    event.preventDefault();
+
+    const form = document.getElementById('form');
     const formData = new FormData(form);
-    let xhr = new XMLHttpRequest();
 
-    xhr.upload.addEventListener("progress", (e) => {
-        progress.value = e.loaded / e.total;
-    });
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://netology-slow-rest.herokuapp.com/upload.php');
+    xhr.upload.onprogress = function (event) {
 
-    xhr.upload.addEventListener("load", (e) => {
-        alert("Файл загружен");
-    });
+        progress.value = event.loaded / event.total;
+    }
 
-    xhr.upload.addEventListener("error", (e) => {
-        alert("Ошибка при загрузке");
-    });
+    xhr.upload.onload = function () {
+        alert("Данные полностью загружены на сервер!");
+    }
 
-    xhr.open("POST", "https://netology-slow-rest.herokuapp.com/upload.php");
     xhr.send(formData);
-
-    e.preventDefault();
-});
+}

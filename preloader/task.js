@@ -1,35 +1,39 @@
-"use strict";
-const table = document.getElementById("items"),
-	loader = document.getElementById("loader");
+'use strict';
 
-// есть ли кэшированные значения
-if (localStorage.hasOwnProperty("curBase")) {
-	showTable(localStorage.getItem("curBase"));
-}
+const loader = document.getElementById('loader');
+const list = document.getElementById('items');
 
-let xhr = new XMLHttpRequest();
-xhr.open("GET", "https://netology-slow-rest.herokuapp.com/");
+
+const xhr = new XMLHttpRequest();
+xhr.open('GET', 'https://netology-slow-rest.herokuapp.com/');
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.addEventListener('readystatechange', show);
 xhr.send();
-xhr.addEventListener("readystatechange", () => {
-	if (xhr.readyState === xhr.DONE && xhr.status == 200) {
 
-		table.innerHTML = ""; // очищаем кэшированные значения
-		showTable(xhr.responseText);
 
-		localStorage.setItem("curBase", xhr.responseText); // сохраняем значения в localStorage
+function show(event) {
 
-		loader.classList.remove("loader_active"); // убираем прелоадер
-	}
-});
+	if (xhr.readyState === 4 && xhr.status === 200) {
 
-// отрисовка таблицы с валютами
-function showTable(base) {
-	const curBase = JSON.parse(base).response.Valute;
-	for (let item in curBase) {
-		table.innerHTML += `<div class="item">
-            <div class="item__code">${curBase[item].CharCode}</div>
-            <div class="item__value">${curBase[item].Value}</div>
-            <div class="item__currency">руб.</div>
-        </div>`;
+		loader.classList.remove('loader_active');
+
+		const data = JSON.parse(xhr.responseText).response.Valute;
+
+		for (const valute in data) {
+			const item = `<div class="item">
+                            <div class="item__code">
+                                ${data[valute].CharCode}
+                            </div>
+                            <div class="item__value">
+                                ${data[valute].Value}
+                            </div>
+                            <div class="item__currency">
+                                руб.
+                            </div>
+                          </div>`;
+
+			list.insertAdjacentHTML('beforeend', item);
+		}
+
 	}
 }
