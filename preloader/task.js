@@ -1,39 +1,40 @@
 'use strict';
 
-const loader = document.getElementById('loader');
-const list = document.getElementById('items');
+let loader = document.getElementById('loader');
+let items = document.getElementById('items');
 
-
-const xhr = new XMLHttpRequest();
-xhr.open('GET', 'https://netology-slow-rest.herokuapp.com/');
-xhr.setRequestHeader('Content-Type', 'application/json');
-xhr.addEventListener('readystatechange', show);
+let xhr = new XMLHttpRequest();
+xhr.open('GET', 'https://students.netoservices.ru/nestjs-backend/slow-get-courses');
 xhr.send();
 
+loader.classList.add('loader_active');
 
-function show(event) {
+xhr.onload = function () {
+	loader.classList.remove('loader_active');
+	loader.classList.add('loader_inactive');
 
-	if (xhr.readyState === 4 && xhr.status === 200) {
+	let response = JSON.parse(xhr.response);
+	let valute = response.response.Valute;
 
-		loader.classList.remove('loader_active');
+	for (let key in valute) {
+		let item = document.createElement('div');
+		item.className = 'item';
 
-		const data = JSON.parse(xhr.responseText).response.Valute;
+		let itemCode = document.createElement('div');
+		itemCode.className = 'item__code';
+		itemCode.innerText = valute[key].CharCode;
+		item.appendChild(itemCode);
 
-		for (const valute in data) {
-			const item = `<div class="item">
-                            <div class="item__code">
-                                ${data[valute].CharCode}
-                            </div>
-                            <div class="item__value">
-                                ${data[valute].Value}
-                            </div>
-                            <div class="item__currency">
-                                руб.
-                            </div>
-                          </div>`;
+		let itemValue = document.createElement('div');
+		itemValue.className = 'item__value';
+		itemValue.innerText = valute[key].Value;
+		item.appendChild(itemValue);
 
-			list.insertAdjacentHTML('beforeend', item);
-		}
+		let itemCurrency = document.createElement('div');
+		itemCurrency.className = 'item__currency';
+		itemCurrency.innerText = 'руб.';
+		item.appendChild(itemCurrency);
 
+		items.appendChild(item);
 	}
-}
+};
